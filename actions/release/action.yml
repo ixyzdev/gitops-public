@@ -1,0 +1,37 @@
+name: Release
+description: >
+  Tag and publish the next version of a repository from what its commits say:
+  patch by default, minor or major only when a commit asks for it with a
+  "Release:" trailer.
+
+inputs:
+  version-files:
+    description: >
+      JSON files, separated by spaces, whose top-level "version" is set to the
+      released version and committed before tagging.
+    required: false
+    default: ""
+  token:
+    description: Token that pushes the tag and creates the GitHub release.
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  version:
+    description: The released version without the "v" prefix; empty when nothing was released.
+    value: ${{ steps.release.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        fetch-depth: 0
+        token: ${{ inputs.token }}
+
+    - id: release
+      shell: bash
+      env:
+        VERSION_FILES: ${{ inputs.version-files }}
+        GH_TOKEN: ${{ inputs.token }}
+      run: bash "${GITHUB_ACTION_PATH}/release.sh"
