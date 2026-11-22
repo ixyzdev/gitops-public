@@ -28,6 +28,8 @@ on:
 
 permissions:
   contents: write
+  issues: read
+  pull-requests: read
 
 concurrency:
   group: release
@@ -40,9 +42,16 @@ jobs:
       - uses: ixyzdev/gitops-public/actions/release@main
         with:
           version-files: package.json
+          claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 ```
 
 `version-files` is optional: JSON files, separated by spaces, whose top-level `version` is set to the released version and committed as `chore(release): vX.Y.Z` before tagging. Leave it out when the tag is the only record of the version.
+
+### Release notes
+
+GitHub generates the first notes of every release from pull request titles. With `claude-code-oauth-token`, Claude then rewrites them following [release-notes.md](actions/release/release-notes.md): why the release exists, what changed point by point, what users must do, why it is a patch, minor or major, what is left out, and the trace from issue to pull request. It reads them from the commits, pull requests and issues of the release, so the workflow needs `issues: read` and `pull-requests: read`.
+
+The token comes from `claude setup-token`, run by the person whose Claude subscription pays for the runs, and lasts one year. Store it as the `CLAUDE_CODE_OAUTH_TOKEN` secret of the repository. Without the secret the input is empty and the release keeps GitHub's notes.
 
 The action's `version` output carries the released version, empty when nothing was released, so a later job can build and attach files to that release.
 
