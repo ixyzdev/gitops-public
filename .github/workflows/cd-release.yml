@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: write
+  issues: read
+  pull-requests: read
 
 concurrency:
   group: release
@@ -17,3 +19,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: ixyzdev/gitops-public/actions/release@main
+        with:
+          claude-code-oauth-token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}

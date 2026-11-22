@@ -61,4 +61,5 @@ gh release create "$next_tag" --verify-tag --generate-notes
 
 if [ -n "${GITHUB_OUTPUT:-}" ]; then
   echo "version=${next_version}" >>"$GITHUB_OUTPUT"
+  echo "previous-tag=${last_tag}" >>"$GITHUB_OUTPUT"
 fi
